@@ -12,6 +12,9 @@ text = extract_text(folder+document_filename)
 conn = sqlite3.connect(folder+"dataextraction.db")
 openai.api_key = open(folder+"openai_key.txt", "r").read().splitlines()[2]
 
+with open(folder+"prompts.json", "r") as f:
+    prompts = json.load(f)
+
 paragraphs = []
 current = ""
 for line in text.split("\n"):
@@ -37,8 +40,6 @@ class Datapoint:
     def find_answer(self, paragraphs):
         filtered = list(filter(lambda x: re.search(self.keyword, x, flags=re.IGNORECASE) != None, 
                            paragraphs))
-        # filtered = list(filter(lambda x: x.find(self.keyword) != -1, 
-        #                    paragraphs))
         print("keyword: {} -> {} Abschnitte gefunden".format(self.keyword, len(filtered)))
         for p in filtered:
             prompt = create_prompt(self, p)
@@ -88,7 +89,7 @@ def call_chatgpt(prompt:str) -> str:
     raw_output = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei."},
+            {"role": "system", "content": prompts["system_prompt"]},
             {"role": "user", "content": prompt}
         ],
         temperature=0.2,
@@ -98,21 +99,19 @@ def call_chatgpt(prompt:str) -> str:
     return output
 
 def create_prompt(datapoint: Datapoint, abschnitt: str) -> None:
-    if datapoint.dtype == "bool":
-        prompt_dtype = "Beantworte die Frage nur mit 'Ja' oder 'Nein'."
-    elif datapoint.dtype == "text": 
-        prompt_dtype = "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
-    else:
+    # if datapoint.dtype == "bool":
+    #     prompt_dtype = "Beantworte die Frage nur mit 'Ja' oder 'Nein'."
+    # elif datapoint.dtype == "text": 
+    #     prompt_dtype = "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
+    # else:
+    #     print("unknown datatype in create_prompt()")
+    #     return
+    try:
+        prompt_dtype = prompts["prompt_dtype"][datapoint.dtype]
+    except:
         print("unknown datatype in create_prompt()")
         return
-    general_prompt = """Im folgenden erhältst du einen kurzen Textabschnitt aus einer Klageschrift. 
-Abschnitt: 
-{abschnitt}
-
-Fasse den Abschnitt kurz zusammen. Füge dann drei Bindestriche ('---') ein. Beantworte danach diese Frage:
-Frage: {frage} 
-{prompt_dtype}
-"""
+    general_prompt = prompts["general_prompt"]
     d = {"abschnitt": abschnitt, "prompt_dtype": prompt_dtype, "frage": datapoint.question}
     return general_prompt.format(**d)
 
@@ -146,7 +145,7 @@ filename = folder + document_filename.replace(".", "_") + "_" + answer_filename
 
 # saving as json file
 with open(filename + ".json", "w") as f:
-    json.dump(answers, f, indent=3)
+    json.dump(answers, f, indent=3, ensure_ascii=False)
     print(f"saved in {filename}.json")
 # also saving in Excel
 df_out = pd.DataFrame.from_records(answers)
