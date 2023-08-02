@@ -1,11 +1,18 @@
 # chatgpt_dataextraction
 A small tool using Python and the ChatGPT API to answer questions about the content of a PDF file
 
+# Database Setup (sqlite3)
+CREATE TABLE chatgpt (
+    key INTEGER PRIMARY KEY AUTOINCREMENT,
+    prompt TEXT,
+    answer TEXT
+);
+
 # Installation
 I used conda with the following setup command:
 conda create -n [venv_name] python openai pandas sqlite pdfminer.six
 
-# List of all packages in the environment:
+## List of all packages in the environment:
 This file may be used to create an environment using:
 $ conda create --name <env> --file <this file>
 platform: osx-arm64
