@@ -5,8 +5,8 @@ import re
 import json
 import pandas as pd
 
-folder = "/Users/janschneider/Documents/fieldfisher_playground/"
-document_filename = "klage.pdf"
+folder = "./"
+document_filename = "urteil.pdf"
 answer_filename = "answers"
 text = extract_text(folder+document_filename)
 conn = sqlite3.connect(folder+"dataextraction.db")
