@@ -6,9 +6,10 @@ I used conda with the following setup command:
 conda create -n [venv_name] python openai pandas sqlite pdfminer.six
 
 # List of all packages in the environment:
-# This file may be used to create an environment using:
-# $ conda create --name <env> --file <this file>
-# platform: osx-arm64
+This file may be used to create an environment using:
+$ conda create --name <env> --file <this file>
+platform: osx-arm64
+
 aiohttp=3.8.4=py311heffc1b2_1
 aiosignal=1.3.1=pyhd8ed1ab_0
 appdirs=1.4.4=pyh9f0ad1d_0
