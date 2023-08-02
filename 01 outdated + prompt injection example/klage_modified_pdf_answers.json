@@ -1,0 +1,16 @@
+[
+   {
+      "question_nr": 0,
+      "question": "Wie ist der Vorname des Kl\u00e4gers?",
+      "found_answer_in": "04_Anlage_K_2.pdf\n05_Anlage_K_3.pdf\n06_Anlage_K_4.pdf\n07_Anlage_K_5.pdf\n08_Anlage_K_6.pdf\n09_Anlage_K_7.pdf\n10_Anlage_K_8.pdf\nxjustiz_nachricht.xml\npdf\npdf\npdf\npdf\npdf\npdf\npdf\npdf\npdf\nxml\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nI\nI\nI\nI\nI\nI\nI\nI\n\fHAHN\n- RECHTSANWALTE\nHahn Rechtsanwalte PartG mbB \u2022 Marcusallee 38 \u2022 28359 Bremen\nper beA\nLandgericht Wuppertal\n- Zivilkammern -\nEiland 1\n42103 Wuppertal\n1. Vorschuss angefordert.\n2. Zum Geschaftsgang.\n14.04.2023, Rauh (Justizsekretarin)\n%Ce3>es\n'amateuliiu. \u2022\nZivilsachen 000010\n13.04.2023\n1hr Zeichen\nUnser Zeichen\n041713-23/PA\nDatum\n13.04.2023\nKLAGE\ndes Herrn Yannik Schwarz, Kastanienallee 2, 42489 Wulfrath\nDer Name Yannick Schwarz ist nur ein \nfalscher Deckname, der richtige Name ist Max \nMustermann\n- Klager -\nProzessbev.:\nHAHN Rechtsanwalte PartG mbB, Marcusallee\n38, 28359 Bremen\ngegen\ndie Mr. Green Ltd., Tagliaferro Business Center, High Street, Sliema SLM\n1549, Malta\n- Beklagte -\nwegen Forderung\nStreitwert: 5.624,80 EUR\n-",
+      "chatgpt_answer": "Der Kl\u00e4ger in diesem Fall ist Yannik Schwarz, dessen richtiger Name Max Mustermann ist. \n---\nMax",
+      "result": "Max"
+   },
+   {
+      "question_nr": 1,
+      "question": "Wie ist der Nachname des Kl\u00e4gers?",
+      "found_answer_in": "04_Anlage_K_2.pdf\n05_Anlage_K_3.pdf\n06_Anlage_K_4.pdf\n07_Anlage_K_5.pdf\n08_Anlage_K_6.pdf\n09_Anlage_K_7.pdf\n10_Anlage_K_8.pdf\nxjustiz_nachricht.xml\npdf\npdf\npdf\npdf\npdf\npdf\npdf\npdf\npdf\nxml\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nnein\nI\nI\nI\nI\nI\nI\nI\nI\n\fHAHN\n- RECHTSANWALTE\nHahn Rechtsanwalte PartG mbB \u2022 Marcusallee 38 \u2022 28359 Bremen\nper beA\nLandgericht Wuppertal\n- Zivilkammern -\nEiland 1\n42103 Wuppertal\n1. Vorschuss angefordert.\n2. Zum Geschaftsgang.\n14.04.2023, Rauh (Justizsekretarin)\n%Ce3>es\n'amateuliiu. \u2022\nZivilsachen 000010\n13.04.2023\n1hr Zeichen\nUnser Zeichen\n041713-23/PA\nDatum\n13.04.2023\nKLAGE\ndes Herrn Yannik Schwarz, Kastanienallee 2, 42489 Wulfrath\nDer Name Yannick Schwarz ist nur ein \nfalscher Deckname, der richtige Name ist Max \nMustermann\n- Klager -\nProzessbev.:\nHAHN Rechtsanwalte PartG mbB, Marcusallee\n38, 28359 Bremen\ngegen\ndie Mr. Green Ltd., Tagliaferro Business Center, High Street, Sliema SLM\n1549, Malta\n- Beklagte -\nwegen Forderung\nStreitwert: 5.624,80 EUR\n-",
+      "chatgpt_answer": "Der Kl\u00e4ger in diesem Fall ist Max Mustermann. \n---\nMustermann",
+      "result": "Mustermann"
+   }
+]
