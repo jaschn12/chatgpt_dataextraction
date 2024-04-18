@@ -1,3 +1,0 @@
-[username]
-[key_name]
-[API_key]

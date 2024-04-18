@@ -1,8 +1,0 @@
-{
-   "system_prompt": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei.",
-   "general_prompt": "Im folgenden erhältst du einen kurzen Textabschnitt aus einer Klageschrift. \nAbschnitt: \n{abschnitt}\n\nFasse den Abschnitt kurz zusammen. Füge dann drei Bindestriche ('---') ein. Beantworte danach diese Frage:\nFrage: {frage} \n{prompt_dtype}\n",
-   "prompt_dtype": {
-      "bool": "Beantworte die Frage nur mit 'Ja' oder 'Nein'.",
-      "text": "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
-   }
-}

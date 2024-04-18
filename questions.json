@@ -1,0 +1,20 @@
+{
+    "Gerichtsentscheidung" : {
+        "c01-Entscheidungsart" : {
+            "question" : "Um was für eine Art von Gerichtsentscheidung handelt es sich bei dem vorliegenden Dokument? Ein Urteil, ein Beschluss oder eine Verfügung?",
+            "searchTerm" : "Urteil|Beschluss",
+            "dataType" : "text",
+            "defaultValue" : "",
+            "promptIntro" : "default",
+            "contextLength" : 0
+        },
+        "c01-Mietrecht" : {
+            "question" : "Verlangt der Kläger Schadensersatz?",
+            "searchTerm" : "Schaden.*ersatz",
+            "dataType" : "bool",
+            "defaultValue" : "false",
+            "promptIntro" : "default",
+            "contextLength" : 0
+        }
+    }
+}
