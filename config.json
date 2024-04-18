@@ -1,5 +1,5 @@
 {
-   "useCache" : "no",
+   "useCache" : "yes",
    "dbName" : "llmCache.db",
    "defaultContextLength" : 100,
    "systemPrompt": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei.",

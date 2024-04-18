@@ -5,8 +5,8 @@ import re
 import io
 import sqlite3
 import os
-from openai import OpenAI
-# from openai import AzureOpenAI
+# from openai import OpenAI
+from openai import AzureOpenAI
 
 class PdfFragment:
     "Repräsentation eines PDF-Teils inkl. Metadaten"
@@ -108,7 +108,7 @@ class Searchable:
                         [pypdf.generic.FloatObject(quad_point) for quad_point in quad_points]),
                     highlight_color="FFD580"
                 )))
-        print(f"{ self.highlights }")
+        # print(f"{ self.highlights }")
     
 class PdfFile:
     "Repräsentation eines PDF Files, wie er an den Service übergeben wird"
@@ -164,12 +164,14 @@ class PdfFile:
             self.writer.add_annotation(page_number=higlight[0], annotation=higlight[1])
     
     def createOutputPdf(self):
-        print(f"{self.writer.write(self.outputPdfStream) = }")
+        # print(f"{self.writer.write(self.outputPdfStream) = }")
+        self.writer.write(self.outputPdfStream)
         self.outputPdfStream.seek(0)
 
 class LlmHandler:
     def __init__(self, config:dict) -> None:
         # self.client = OpenAI()
+        self.client = AzureOpenAI()
         # self.client = AzureOpenAI(
         #     azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
         #     api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
@@ -211,10 +213,10 @@ class LlmHandler:
     
     def callLlm(self, promptBody:str) -> str:
         # placeholder
-        return "Das ist ein Text aus einem juristischen Dokument. --- Ja"
+        # return "Das ist ein Text aus einem juristischen Dokument. --- Ja"
         
         raw_output = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="pdf-chat", # model = "deployment_name"
             messages=[
                 {"role": "system", "content": self.config["systemPrompt"]},
                 {"role": "user", "content": promptBody}
@@ -222,8 +224,9 @@ class LlmHandler:
             temperature=0.1,
             max_tokens=300
             )
-        output = raw_output['choices'][0]['message']['content']
-        return output
+        output = raw_output.choices[0].message.content
+        print(f"{output = }")
+        return output if output else ""
 
     def _promptCacheLookup(self, promptBody:str) -> str|bool:
         with sqlite3.connect(self.dbPath) as conn:
@@ -248,8 +251,8 @@ class Datapoint:
         self.defaultValue = defaultValue
         self.promptIntro = promptIntro
         # Output
-        self.answer = None
-        self.relevantSearchable = None
+        self.answer:str|None = None
+        self.relevantSearchable:Searchable|None = None
         self.result = defaultValue
     
     def findAnswer(self, searchables:list[Searchable]):
