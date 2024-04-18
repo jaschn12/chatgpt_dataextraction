@@ -10,7 +10,7 @@
         },
         "c01-Schadensersatz" : {
             "question" : "Verlangt der Kläger Schadensersatz?",
-            "searchTerm" : "Schaden.*ersatz",
+            "searchTerm" : "Schaden.{0,2}ersatz",
             "dataType" : "bool",
             "defaultValue" : "false",
             "promptIntro" : "default",
