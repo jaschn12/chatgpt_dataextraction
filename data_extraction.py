@@ -169,15 +169,18 @@ class PdfFile:
 
 class LlmHandler:
     def __init__(self, config:dict) -> None:
-        self.client = OpenAI()
+        # self.client = OpenAI()
         # self.client = AzureOpenAI(
         #     azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
         #     api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
         #     api_version="2024-02-01"
         #     )
         self.config = config
+        self.dbPath = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            config["dbName"])
         if config["useCache"] == "yes":
-            with sqlite3.connect(config["dbName"]) as conn:
+            with sqlite3.connect(self.dbPath) as conn:
                 sql = """CREATE TABLE IF NOT EXISTS llmCache (
                     key INTEGER PRIMARY KEY AUTOINCREMENT,
                     promptBody TEXT,
@@ -223,12 +226,12 @@ class LlmHandler:
         return output
 
     def _promptCacheLookup(self, promptBody:str) -> str|bool:
-        with sqlite3.connect(self.config["dbName"]) as conn:
+        with sqlite3.connect(self.dbPath) as conn:
             lookup = conn.cursor().execute("SELECT answer FROM llmCache WHERE promptBody LIKE ?", (promptBody, )).fetchone()
         if lookup != None: return lookup[0]
         return False
     def _add2cache(self, promptBody:str, answer:str):
-        with sqlite3.connect(self.db_name) as conn:
+        with sqlite3.connect(self.dbPath) as conn:
             conn.cursor().execute("INSERT INTO llmCache (prompt, answer) VALUES (?, ?)", 
                                     (promptBody, answer))
 
@@ -310,8 +313,12 @@ def readConfigFile(filename : str) -> dict:
     return config
 
 def dataextraction(fileReader: io.BufferedReader, docName:str):
-    questionsConfig = readConfigFile("questions.json")
-    config = readConfigFile("config.json")
+    questionsConfig = readConfigFile(os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        "questions.json"))
+    config = readConfigFile(os.path.join(
+        os.path.abspath(os.path.dirname(__file__)),
+        "config.json"))
     llmHandler = LlmHandler(config=config)
 
     pdf = PdfFile(inputPdfStream=fileReader, documentCategory=docName)
