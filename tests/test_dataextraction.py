@@ -18,8 +18,9 @@ def test_readConfig():
     assert structure != {}
 
 def test_dataextraction():
+    dataExtractor = data_extraction.DataExtractor()
     with open(os.path.join("tests", "urteil.pdf"), "rb") as f:
-        result = data_extraction.dataextraction(
+        result = dataExtractor(
             fileReader=f,
             docName="Gerichtsentscheidung"
         )

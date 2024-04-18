@@ -312,60 +312,63 @@ def readConfigFile(filename : str) -> dict:
         config = json.load(f)
     return config
 
-def dataextraction(fileReader: io.BufferedReader, docName:str):
-    questionsConfig = readConfigFile(os.path.join(
-        os.path.abspath(os.path.dirname(__file__)),
-        "questions.json"))
-    config = readConfigFile(os.path.join(
-        os.path.abspath(os.path.dirname(__file__)),
-        "config.json"))
-    llmHandler = LlmHandler(config=config)
+class DataExtractor:
+    def __init__(self) -> None:
+        self.questionsConfig = readConfigFile(os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            "questions.json"))
+        self.config = readConfigFile(os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            "config.json"))
+        self.llmHandler = LlmHandler(config=self.config)
+        
+    def __call__(self, fileReader: io.BufferedReader, docName:str):
+        pdf = PdfFile(inputPdfStream=fileReader, documentCategory=docName)
+        pdf.parsePdf()
+        
+        result = Result(pdf=pdf)
 
-    pdf = PdfFile(inputPdfStream=fileReader, documentCategory=docName)
-    pdf.parsePdf()
-    
-    result = Result(pdf=pdf)
+        questions = self.questionsConfig[docName]
+        for datapointName, value in questions.items():
+            datapoint = Datapoint(
+                llmHandler =     self.llmHandler,
+                question =       value["question"],
+                searchTerm =     value["searchTerm"],
+                dataType =       value["dataType"],
+                contextLength =  value["contextLength"] if value["contextLength"] > 0 else self.config['defaultContextLength'],
+                defaultValue =   value["defaultValue"],
+                promptIntro =    value["promptIntro"]
+            )
 
-    questions = questionsConfig[docName]
-    for datapointName, value in questions.items():
-        datapoint = Datapoint(
-            llmHandler =     llmHandler,
-            question =       value["question"],
-            searchTerm =     value["searchTerm"],
-            dataType =       value["dataType"],
-            contextLength =  value["contextLength"] if value["contextLength"] > 0 else config['defaultContextLength'],
-            defaultValue =   value["defaultValue"],
-            promptIntro =    value["promptIntro"]
-        )
+            # create searchables from fragments
+            fragmentLists = Searchable.createFragmentList(pdf.fragments, datapoint.contextLength)
+            searchables = [Searchable(fragments=fragmentList) for fragmentList in fragmentLists]
 
-        # create searchables from fragments
-        fragmentLists = Searchable.createFragmentList(pdf.fragments, datapoint.contextLength)
-        searchables = [Searchable(fragments=fragmentList) for fragmentList in fragmentLists]
+            # searching
+            datapoint.findAnswer(searchables)
 
-        # searching
-        datapoint.findAnswer(searchables)
+            # adding annotations
+            if datapoint.relevantSearchable:
+                searchable = datapoint.relevantSearchable
+                searchable.createHighlights(description=datapointName)
+                pdf.addHighlightsFromSearchable(searchable)
+                pageNr = searchable.fragments[0].page
+            else: pageNr = -1
 
-        # adding annotations
-        if datapoint.relevantSearchable:
-            searchable = datapoint.relevantSearchable
-            searchable.createHighlights(description=datapointName)
-            pdf.addHighlightsFromSearchable(searchable)
-            pageNr = searchable.fragments[0].page
-        else: pageNr = -1
-
-        result.values.update({
-            datapointName : {
-            "value" : datapoint.result,
-            "pageNr" : pageNr}
-        })
-    
-    # write the pdf into memory
-    pdf.createOutputPdf()
-    return result 
+            result.values.update({
+                datapointName : {
+                "value" : datapoint.result,
+                "pageNr" : pageNr}
+            })
+        
+        # write the pdf into memory
+        pdf.createOutputPdf()
+        return result 
 
 if __name__ == "__main__":
+    dataExtractor = DataExtractor()
     with open(os.path.join("tests", "urteil.pdf"), "rb") as f:
-        result = dataextraction(
+        result = dataExtractor(
             fileReader=f,
             docName="Gerichtsentscheidung"
         )
