@@ -1,12 +1,12 @@
 {
-   "useCache" : "yes",
-   "dbName" : "llmCache.db",
-   "defaultContextLength" : 100,
-   "systemPrompt": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei.",
-   "structure": "{intro}\nAbschnitt: \n{source}\n\nFasse den Abschnitt kurz zusammen. Füge dann drei Bindestriche ('---') ein. Beantworte danach diese Frage:\nFrage: {question} \n{dataTypePart}\n",
-   "generalIntro" : "Im folgenden erhältst du einen kurzen Textabschnitt.",
-   "dataTypePart": {
-       "bool": "Beantworte die Frage nur mit 'Ja' oder 'Nein'.",
-       "text": "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
-   }
+    "useCache" : "yes",
+    "dbName" : "llmCache.db",
+    "defaultContextLength" : 100,
+    "systemPrompt": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei.",
+    "structure": "{intro}\nAbschnitt: \n{source}\n\nFasse den Abschnitt kurz zusammen. Füge dann drei Bindestriche ('---') ein. Beantworte danach diese Frage:\nFrage: {question} \n{dataTypePart}\n",
+    "generalIntro" : "Im folgenden erhältst du einen kurzen Textabschnitt.",
+    "dataTypePart": {
+        "bool": "Beantworte die Frage nur mit 'Ja' oder 'Nein'.",
+        "text": "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
+    }
 }

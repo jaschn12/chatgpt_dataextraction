@@ -3,3 +3,4 @@ __pycache__
 llmCache.db
 .env
 .DS_Store
+secrets.json

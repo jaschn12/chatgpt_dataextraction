@@ -169,14 +169,14 @@ class PdfFile:
         self.outputPdfStream.seek(0)
 
 class LlmHandler:
-    def __init__(self, config:dict) -> None:
+    def __init__(self, config:dict, secrets:dict) -> None:
         # self.client = OpenAI()
-        self.client = AzureOpenAI()
-        # self.client = AzureOpenAI(
-        #     azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
-        #     api_key=os.getenv("AZURE_OPENAI_API_KEY"),  
-        #     api_version="2024-02-01"
-        #     )
+        # self.client = AzureOpenAI()
+        self.client = AzureOpenAI(
+            azure_endpoint = secrets["AZURE_OPENAI_ENDPOINT"], 
+            api_key=         secrets["AZURE_OPENAI_API_KEY"],  
+            api_version=     secrets["OPENAI_API_VERSION"]
+            )
         self.config = config
         self.dbPath = os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
@@ -323,7 +323,10 @@ class DataExtractor:
         self.config = readConfigFile(os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
             "config.json"))
-        self.llmHandler = LlmHandler(config=self.config)
+        secrets = readConfigFile(os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            "secrets.json"))
+        self.llmHandler = LlmHandler(config=self.config, secrets=secrets)
         
     def __call__(self, fileReader: io.BufferedReader, docName:str):
         pdf = PdfFile(inputPdfStream=fileReader, documentCategory=docName)
