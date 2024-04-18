@@ -8,7 +8,7 @@
             "promptIntro" : "default",
             "contextLength" : 0
         },
-        "c01-Mietrecht" : {
+        "c01-Schadensersatz" : {
             "question" : "Verlangt der Kläger Schadensersatz?",
             "searchTerm" : "Schaden.*ersatz",
             "dataType" : "bool",
