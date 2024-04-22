@@ -15,6 +15,14 @@
             "defaultValue" : "false",
             "promptIntro" : "default",
             "contextLength" : 0
+        },
+        "c01-JobBeschreibungKläger" : {
+            "question" : "Welchen Beruf übt der Mieter aus? Es genügt, wenn sich das aus dem Kontext ergibt",
+            "searchTerm" : "Job|Beruf|Kl.{0,2}ger",
+            "dataType" : "freeText",
+            "defaultValue" : "",
+            "promptIntro" : "default",
+            "contextLength" : 200
         }
     }
 }

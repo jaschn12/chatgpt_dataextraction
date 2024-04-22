@@ -1,12 +1,14 @@
 {
     "useCache" : "yes",
     "dbName" : "llmCache.db",
-    "defaultContextLength" : 100,
-    "systemPrompt": "Du bist ein präziser und sorgfältiger Assistent in einer Anwaltskanzlei.",
-    "structure": "{intro}\nAbschnitt: \n{source}\n\nFasse den Abschnitt kurz zusammen. Füge dann drei Bindestriche ('---') ein. Beantworte danach diese Frage:\nFrage: {question} \n{dataTypePart}\n",
-    "generalIntro" : "Im folgenden erhältst du einen kurzen Textabschnitt.",
+    "defaultContextLength" : 200,
+    "systemPrompt": "Du bist ein hilfreicher Assistent",
+    "structure": "Du durchsuchst einen Text nach Informationen. Du suchst die Antwort auf diese Frage: ### {question}\n###\n {intro}###\n{source}###\n{dataTypePart}\n{notFoundPart}\nAusgabe-Format: ###\nzusammenfassung: ...\nantwort: ...\nweitersuchen: Ja/Nein\n### \n",
+    "generalIntro" : "Text:",
+    "notFoundPart": "Wenn sich keine eindeutige Antwort aus dem Abschnitt entnehmen lässt, muss der Text weiterdurchsucht werden. Trage dafür unter 'weitersuchen' 'Ja' ein",
     "dataTypePart": {
-        "bool": "Beantworte die Frage nur mit 'Ja' oder 'Nein'.",
-        "text": "Gib eine Ein-Wort-Antwort. Bilde keinen Satz."
+        "bool": "Beantworte die Frage nur mit 'Ja' oder 'Nein'",
+        "text": "Beantworte die Frage mit 1 bis 5 Worten",
+        "freeText": "Schreibe einen kurzen Absatz, der die Frage beantwortet"
     }
 }

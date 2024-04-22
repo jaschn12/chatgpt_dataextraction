@@ -189,6 +189,7 @@ class LlmHandler:
                     answer TEXT
                     );"""
                 conn.cursor().execute(sql)
+                conn.commit()
             self.promptCacheLookup = self._promptCacheLookup
             self.add2cache = self._add2cache
         else:
@@ -199,15 +200,18 @@ class LlmHandler:
             
 
     def createPromptBody(self, promptParts:dict, searchable:Searchable) -> str:
-        try: dataTypePart = self.config["dataTypePart"][promptParts["dataType"]]
+        try: 
+            dataTypePart = self.config["dataTypePart"][promptParts["dataType"]]
         except KeyError as error: 
-            print(f"Key Error in function createPrompt(): {promptParts = } with {promptParts['dataType'] = }. Does this datatype exist?")
+            print(f"Key Error {error} in function createPrompt(): {promptParts = } with {promptParts['dataType'] = }. Does this datatype exist?")
             return ""
+        notFoundPart = self.config["notFoundPart"]
         promptBody = self.config["structure"].format(**{
             "intro" : promptParts["promptIntro"] if promptParts["promptIntro"] != "default" else self.config["generalIntro"],
             "source" : searchable.getText(),
             "question" : promptParts["question"],
-            "dataTypePart" : dataTypePart
+            "dataTypePart" : dataTypePart,
+            "notFoundPart" : notFoundPart
         })
         return promptBody
     
@@ -221,8 +225,8 @@ class LlmHandler:
                 {"role": "system", "content": self.config["systemPrompt"]},
                 {"role": "user", "content": promptBody}
             ],
-            temperature=0.1,
-            max_tokens=300
+            temperature=0.,
+            max_tokens=500
             )
         output = raw_output.choices[0].message.content
         print(f"{output = }")
@@ -237,6 +241,7 @@ class LlmHandler:
         with sqlite3.connect(self.dbPath) as conn:
             conn.cursor().execute("INSERT INTO llmCache (prompt, answer) VALUES (?, ?)", 
                                     (promptBody, answer))
+            conn.commit()
 
 class Datapoint:
     "Repräsentation eines Datenpunkts, bspw. ein Clausebase-Datafield"
@@ -251,7 +256,7 @@ class Datapoint:
         self.defaultValue = defaultValue
         self.promptIntro = promptIntro
         # Output
-        self.answer:str|None = None
+        self.answer:str = ""
         self.relevantSearchable:Searchable|None = None
         self.result = defaultValue
     
@@ -266,36 +271,59 @@ class Datapoint:
                     "question" : self.question}, 
                 searchable)
             lookup = self.llmHandler.promptCacheLookup(promptBody=promptBody)
-            if lookup: self.answer = lookup
+            if isinstance(lookup, str): self.answer = lookup
             else: 
-                self.answer = self.llmHandler.callLlm(promptBody=promptBody)
-            self._evaluateAnswer()
-            if self.result != self.defaultValue: # wenn Antwort gefunden
+                answer = self.llmHandler.callLlm(promptBody=promptBody)
+            found, result = self._evaluateAnswer(answer)
+            print(f"{found = } and {result = }")
+            if found:
+                self.answer = answer
+                self.result = result
                 self.relevantSearchable = searchable
                 return
     
-    def _evaluateAnswer(self):
-        splitPhrase = "---"
+    def _evaluateAnswer(self, answer:str) -> tuple[bool, object]:
+        indizes = {"zusammenfassung" : -1, 
+                 "antwort" : -1,
+                 "weitersuchen" : -1}
+        for key in indizes.keys():
+            index = answer.find(f"{key}:")
+            if index == -1:
+                print(f"'{key}:' not found in {answer = }")
+            indizes[key] = index
+        
+        if -1 in indizes.values(): # evaluation failed
+            return (False, None)
+        zusammenfassung = answer[indizes['zusammenfassung']+len('zusammenfassung')+2:indizes['antwort']].strip()
+        antwort = answer[indizes['antwort']+len('antwort')+2:indizes['weitersuchen']].strip()
+        weitersuchen = answer[indizes['weitersuchen']+len('weitersuchen')+2:].strip()
+
+        if "ja" in weitersuchen.lower():
+            return (False, answer)
+
         if self.dataType == "bool":
-            index_sep = self.answer.find(splitPhrase)
-            if index_sep == -1: int(0.9 * len(self.answer))
-            if self.answer.find("Ja", index_sep) != -1: 
+            print("bool data: answer = ", antwort)
+            if "Ja" in antwort: 
                 #print("answer: ", self.answer)
-                self.result = True
-            elif self.answer.find("Nein", index_sep) != -1: self.result = False
-            else: pass
+                # result = True
+                return (True, True)
+            elif "Nein" in antwort: 
+                # result = False
+                return (True, False)
+            else: 
+                return (False, None)
                 #print("evaluating the answer failed:", self.answer)
             
         elif self.dataType == "text": 
-            index_sep = self.answer.find(splitPhrase)
-            if index_sep == -1: 
-                if len(self.answer) > 30:
-                    #print("evaluating the answer failed:", self.answer)
-                    return
-                else: index_sep = 0
-            self.result = self.answer[index_sep+len(splitPhrase):].strip()
+            print("text data: answer = ", answer)
+            return (True, antwort)
+
+        elif self.dataType == "freeText": 
+            print("freeText data: answer = ", answer)
+            return (True, antwort)
         else:
             print("evaluate_answer(): unknown datatype:", self.dataType)
+            return (False, None)
 
     def __str__(self) -> str:
         return "\n".join(str(element) for element in 
@@ -316,16 +344,13 @@ def readConfigFile(filename : str) -> dict:
     return config
 
 class DataExtractor:
-    def __init__(self) -> None:
+    def __init__(self, secrets:dict) -> None:
         self.questionsConfig = readConfigFile(os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
             "questions.json"))
         self.config = readConfigFile(os.path.join(
             os.path.abspath(os.path.dirname(__file__)),
             "config.json"))
-        secrets = readConfigFile(os.path.join(
-            os.path.abspath(os.path.dirname(__file__)),
-            "secrets.json"))
         self.llmHandler = LlmHandler(config=self.config, secrets=secrets)
         
     def __call__(self, fileReader: io.BufferedReader, docName:str):
